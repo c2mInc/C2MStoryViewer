@@ -6,10 +6,8 @@ import android.view.MotionEvent
 
 import androidx.viewpager.widget.ViewPager
 
-class FixedViewPager : ViewPager {
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-
+class FixedViewPager @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+    ViewPager(context, attrs) {
     // prevent NPE if fake dragging and touching ViewPager
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         return if (isFakeDragging) {

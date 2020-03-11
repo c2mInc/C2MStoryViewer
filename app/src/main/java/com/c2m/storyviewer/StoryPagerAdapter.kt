@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 
-class StoryPagerAdapter constructor(fragmentManager: FragmentManager, private val storyList: ArrayList<Story>, private val storyDisplayOrigin: String)
+class StoryPagerAdapter constructor(fragmentManager: FragmentManager, private val storyList: ArrayList<StoryUser>)
     : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     override fun getItem(position: Int): Fragment = StoryDisplayFragment.newInstance(position, storyList[position])
@@ -22,7 +22,7 @@ class StoryPagerAdapter constructor(fragmentManager: FragmentManager, private va
         }
     }
 
-    fun submitList(newStoryList: ArrayList<Story>) {
+    fun submitList(newStoryList: ArrayList<StoryUser>) {
         storyList.addAll(newStoryList)
         notifyDataSetChanged()
     }
