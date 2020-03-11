@@ -1,5 +1,7 @@
-package com.c2m.storyviewer
+package com.c2m.storyviewer.utils
 
+import com.c2m.storyviewer.data.Story
+import com.c2m.storyviewer.data.StoryUser
 import kotlin.random.Random
 
 object StoryGenerator {

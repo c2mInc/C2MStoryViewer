@@ -1,4 +1,4 @@
-package com.c2m.storyviewer
+package com.c2m.storyviewer.screen
 
 import android.os.Handler
 import android.util.Log

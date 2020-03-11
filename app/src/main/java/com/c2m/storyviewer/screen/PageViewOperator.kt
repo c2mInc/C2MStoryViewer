@@ -1,4 +1,4 @@
-package com.c2m.storyviewer
+package com.c2m.storyviewer.screen
 
 interface PageViewOperator {
     fun backPageView()

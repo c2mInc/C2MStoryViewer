@@ -1,4 +1,4 @@
-package com.c2m.storyviewer
+package com.c2m.storyviewer.screen
 
 import android.animation.Animator
 import android.animation.ValueAnimator
@@ -8,10 +8,16 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.bumptech.glide.Glide
+import com.c2m.storyviewer.*
+import com.c2m.storyviewer.customview.StoryPagerAdapter
+import com.c2m.storyviewer.data.StoryUser
+import com.c2m.storyviewer.utils.CubeOutTransformer
+import com.c2m.storyviewer.utils.StoryGenerator
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
-class MainActivity : AppCompatActivity(), PageViewOperator {
+class MainActivity : AppCompatActivity(),
+    PageViewOperator {
 
     private lateinit var pagerAdapter: StoryPagerAdapter
     private var currentPage: Int = 0
@@ -49,10 +55,15 @@ class MainActivity : AppCompatActivity(), PageViewOperator {
         val storyUserList = StoryGenerator.generateStories()
         preLoadStories(storyUserList)
 
-        pagerAdapter = StoryPagerAdapter(supportFragmentManager, storyUserList)
+        pagerAdapter = StoryPagerAdapter(
+            supportFragmentManager,
+            storyUserList
+        )
         viewPager.adapter = pagerAdapter
         viewPager.currentItem = currentPage
-        viewPager.setPageTransformer(true, CubeOutTransformer())
+        viewPager.setPageTransformer(true,
+            CubeOutTransformer()
+        )
         viewPager.addOnPageChangeListener(object : PageChangeListener() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)

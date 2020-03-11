@@ -42,7 +42,7 @@
             android:background="@drawable/story_top_shadow"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.c2m.storyviewer.StoriesProgressView
+        <com.c2m.storyviewer.customview.StoriesProgressView
             android:id="@+id/storiesProgressView"
             android:layout_width="match_parent"
             android:layout_height="3dp"

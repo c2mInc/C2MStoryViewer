@@ -1,4 +1,4 @@
-package com.c2m.storyviewer
+package com.c2m.storyviewer.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity

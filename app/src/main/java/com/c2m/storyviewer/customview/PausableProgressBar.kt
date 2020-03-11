@@ -1,4 +1,4 @@
-package com.c2m.storyviewer
+package com.c2m.storyviewer.customview
 
 import android.content.Context
 import android.util.AttributeSet
@@ -8,6 +8,8 @@ import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
+import com.c2m.storyviewer.utils.PausableScaleAnimation
+import com.c2m.storyviewer.R
 
 class PausableProgressBar @JvmOverloads constructor(
     context: Context,
@@ -78,7 +80,16 @@ class PausableProgressBar @JvmOverloads constructor(
         maxProgressView!!.visibility = View.GONE
         if (duration <= 0) duration = 4000
         animation =
-            PausableScaleAnimation(0f, 1f, 1f, 1f, Animation.ABSOLUTE, 0f, Animation.RELATIVE_TO_SELF, 0f)
+            PausableScaleAnimation(
+                0f,
+                1f,
+                1f,
+                1f,
+                Animation.ABSOLUTE,
+                0f,
+                Animation.RELATIVE_TO_SELF,
+                0f
+            )
         animation!!.duration = duration
         animation!!.interpolator = LinearInterpolator()
         animation!!.setAnimationListener(object : AnimationListener {

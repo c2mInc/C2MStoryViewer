@@ -1,4 +1,4 @@
-package com.c2m.storyviewer
+package com.c2m.storyviewer.utils
 
 import android.view.animation.ScaleAnimation
 import android.view.animation.Transformation

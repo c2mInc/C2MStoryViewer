@@ -1,4 +1,4 @@
-package com.c2m.storyviewer
+package com.c2m.storyviewer.customview
 
 import android.content.Context
 import android.util.AttributeSet

@@ -1,9 +1,10 @@
-package com.c2m.storyviewer
+package com.c2m.storyviewer.customview
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import com.c2m.storyviewer.R
 import java.util.*
 
 class StoriesProgressView @JvmOverloads constructor(
@@ -23,7 +24,9 @@ class StoriesProgressView @JvmOverloads constructor(
 
     init {
         orientation = HORIZONTAL
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.StoriesProgressView)
+        val typedArray = context.obtainStyledAttributes(attrs,
+            R.styleable.StoriesProgressView
+        )
         storiesCount = typedArray.getInt(R.styleable.StoriesProgressView_progressCount, 0)
         typedArray.recycle()
         bindViews()
@@ -45,13 +48,15 @@ class StoriesProgressView @JvmOverloads constructor(
 
     private fun createProgressBar(): PausableProgressBar {
         return PausableProgressBar(context).apply {
-            layoutParams = PROGRESS_BAR_LAYOUT_PARAM
+            layoutParams =
+                PROGRESS_BAR_LAYOUT_PARAM
         }
     }
 
     private fun createSpace(): View {
         return View(context).apply {
-            layoutParams = SPACE_LAYOUT_PARAM
+            layoutParams =
+                SPACE_LAYOUT_PARAM
         }
     }
 

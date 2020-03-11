@@ -1,4 +1,4 @@
-package com.c2m.storyviewer
+package com.c2m.storyviewer.screen
 
 import android.content.Context
 import android.os.Bundle
@@ -10,16 +10,24 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import com.c2m.storyviewer.*
+import com.c2m.storyviewer.customview.StoriesProgressView
+import com.c2m.storyviewer.data.Story
+import com.c2m.storyviewer.data.StoryUser
+import com.c2m.storyviewer.utils.OnSwipeTouchListener
 import kotlinx.android.synthetic.main.fragment_story_display.*
 import java.util.*
 
-class StoryDisplayFragment : Fragment(), StoriesProgressView.StoriesListener {
+class StoryDisplayFragment : Fragment(),
+    StoriesProgressView.StoriesListener {
 
     private val position: Int by
     lazy { arguments?.getInt(EXTRA_POSITION) ?: 0 }
 
     private val storyUser: StoryUser by
-    lazy { (arguments?.getParcelable<StoryUser>(EXTRA_STORY_USER) as StoryUser) }
+    lazy { (arguments?.getParcelable<StoryUser>(
+        EXTRA_STORY_USER
+    ) as StoryUser) }
 
     private val stories: ArrayList<Story> by
     lazy { storyUser.stories }

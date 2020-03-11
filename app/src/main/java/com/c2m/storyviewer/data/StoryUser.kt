@@ -1,6 +1,7 @@
-package com.c2m.storyviewer
+package com.c2m.storyviewer.data
 
 import android.os.Parcelable
+import com.c2m.storyviewer.data.Story
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
