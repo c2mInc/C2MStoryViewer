@@ -9,6 +9,7 @@ class StoryPagerAdapter constructor(fragmentManager: FragmentManager, private va
     : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     override fun getItem(position: Int): Fragment = StoryDisplayFragment.newInstance(position, storyList[position])
+
     override fun getCount(): Int {
         return storyList.size
     }
@@ -20,10 +21,5 @@ class StoryPagerAdapter constructor(fragmentManager: FragmentManager, private va
         } finally {
             finishUpdate(viewPager)
         }
-    }
-
-    fun submitList(newStoryList: ArrayList<StoryUser>) {
-        storyList.addAll(newStoryList)
-        notifyDataSetChanged()
     }
 }

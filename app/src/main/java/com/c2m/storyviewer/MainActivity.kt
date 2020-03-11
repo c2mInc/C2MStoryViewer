@@ -53,13 +53,10 @@ class MainActivity : AppCompatActivity(), PageViewOperator {
         viewPager.adapter = pagerAdapter
         viewPager.currentItem = currentPage
         viewPager.setPageTransformer(true, CubeOutTransformer())
-
         viewPager.addOnPageChangeListener(object : PageChangeListener() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 currentPage = position
-                //(pagerAdapter.instantiateItem(viewPager,currentPage) as StoryDisplayFragment).setIsActive()
-                //currentFragment()?.resumeCurrentStory()
             }
 
             override fun onPageScrollCanceled() {
@@ -75,7 +72,6 @@ class MainActivity : AppCompatActivity(), PageViewOperator {
             }
         }
     }
-
 
     private fun currentFragment(): StoryDisplayFragment? {
         return pagerAdapter.findFragmentByPosition(viewPager, currentPage) as StoryDisplayFragment

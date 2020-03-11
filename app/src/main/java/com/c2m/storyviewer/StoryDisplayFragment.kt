@@ -3,7 +3,6 @@ package com.c2m.storyviewer
 import android.content.Context
 import android.os.Bundle
 import android.text.format.DateFormat
-
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -13,7 +12,6 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_story_display.*
 import java.util.*
-import kotlin.collections.ArrayList
 
 class StoryDisplayFragment : Fragment(), StoriesProgressView.StoriesListener {
 
@@ -97,7 +95,7 @@ class StoryDisplayFragment : Fragment(), StoriesProgressView.StoriesListener {
         val cal: Calendar = Calendar.getInstance(Locale.ENGLISH).apply {
             timeInMillis = stories[counter].storyDate
         }
-        storyDisplayTime.text = DateFormat.format("dd-MM-yyyy HH:mm:ss", cal).toString()
+        storyDisplayTime.text = DateFormat.format("MM-dd-yyyy HH:mm:ss", cal).toString()
     }
 
     private fun setUpUi() {

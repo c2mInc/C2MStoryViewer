@@ -6,10 +6,6 @@ import androidx.viewpager.widget.ViewPager.*
 
 abstract class PageChangeListener : OnPageChangeListener {
 
-    companion object {
-        private const val DEBOUNCE_TIMES = 500L
-    }
-
     private var pageBeforeDragging = 0
     private var currentPage = 0
     private var lastTime = DEBOUNCE_TIMES + 1L
@@ -48,4 +44,8 @@ abstract class PageChangeListener : OnPageChangeListener {
     }
 
     abstract fun onPageScrollCanceled()
+
+    companion object {
+        private const val DEBOUNCE_TIMES = 500L
+    }
 }

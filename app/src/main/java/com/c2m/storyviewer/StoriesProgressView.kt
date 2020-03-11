@@ -19,7 +19,7 @@ class StoriesProgressView @JvmOverloads constructor(
     private var isSkipStart = false
     private var isReverseStart = false
     private var position = -1
-    var isComplete = false
+    private var isComplete = false
 
     init {
         orientation = HORIZONTAL
