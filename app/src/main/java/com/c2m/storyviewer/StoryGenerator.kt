@@ -22,30 +22,20 @@ object StoryGenerator {
         userProfileUrls.add("https://randomuser.me/api/portraits/men/2.jpg")
         userProfileUrls.add("https://randomuser.me/api/portraits/women/3.jpg")
         userProfileUrls.add("https://randomuser.me/api/portraits/men/11.jpg")
+        userProfileUrls.add("https://randomuser.me/api/portraits/women/14.jpg")
+        userProfileUrls.add("https://randomuser.me/api/portraits/men/21.jpg")
+        userProfileUrls.add("https://randomuser.me/api/portraits/women/28.jpg")
+        userProfileUrls.add("https://randomuser.me/api/portraits/men/16.jpg")
 
         val storyUserList = ArrayList<StoryUser>()
         for (i in 1..10){
             val stories = ArrayList<Story>()
             val storySize = Random.nextInt(1,5)
             for (j in 0 until storySize){
-                stories.add(Story(storyUrls[Random.nextInt(storyUrls.size)],System.currentTimeMillis()))
+                stories.add(Story(storyUrls[Random.nextInt(storyUrls.size)], System.currentTimeMillis() - (1 * (24-j) * 60 * 60 * 1000)))
             }
             storyUserList.add(StoryUser("username$i",userProfileUrls[Random.nextInt(userProfileUrls.size)],stories))
         }
-/*
-        var stories = ArrayList<Story>()
-        stories.add(Story(storyUrls[0], storyDate = 1583779998))
-        storyUserList.add(StoryUser("firstUser", userProfileUrls[0], stories))
-
-        stories = ArrayList()
-        stories.add(Story(storyUrls[1], storyDate = 1583779998))
-        stories.add(Story(storyUrls[2], storyDate = 1583779998))
-        storyUserList.add(StoryUser("secondUser", userProfileUrls[1], stories))
-
-        stories = ArrayList()
-        stories.add(Story(storyUrls[3], storyDate = 1583779998))
-        stories.add(Story(storyUrls[4], storyDate = 1583779998))
-        storyUserList.add(StoryUser("secondUser", userProfileUrls[2], stories))*/
 
         return storyUserList
     }

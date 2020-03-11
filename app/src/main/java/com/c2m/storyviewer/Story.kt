@@ -7,10 +7,4 @@ import kotlinx.android.parcel.Parcelize
 data class Story(
     val url: String,
     val storyDate: Long
-) : Parcelable {
-
-    fun getElapsedTime(): Long {
-        return System.currentTimeMillis() / 1000 - storyDate
-    }
-
-}
+) : Parcelable

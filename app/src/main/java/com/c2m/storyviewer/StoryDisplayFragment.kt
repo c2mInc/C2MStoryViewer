@@ -2,6 +2,8 @@ package com.c2m.storyviewer
 
 import android.content.Context
 import android.os.Bundle
+import android.text.format.DateFormat
+
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -10,6 +12,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_story_display.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class StoryDisplayFragment : Fragment(), StoriesProgressView.StoriesListener {
 
@@ -54,7 +58,6 @@ class StoryDisplayFragment : Fragment(), StoriesProgressView.StoriesListener {
     override fun onResume() {
         super.onResume()
         if (counter == 0) {
-            // start animation
             storiesProgressView?.startStories()
         } else {
             // restart animation
@@ -65,7 +68,6 @@ class StoryDisplayFragment : Fragment(), StoriesProgressView.StoriesListener {
 
     override fun onPause() {
         super.onPause()
-//        storiesProgressView?.pause()
         storiesProgressView?.abandon()
     }
 
@@ -91,6 +93,11 @@ class StoryDisplayFragment : Fragment(), StoriesProgressView.StoriesListener {
 
     private fun updateStory() {
         Glide.with(this).load(stories[counter].url).into(storyDisplayImage)
+
+        val cal: Calendar = Calendar.getInstance(Locale.ENGLISH).apply {
+            timeInMillis = stories[counter].storyDate
+        }
+        storyDisplayTime.text = DateFormat.format("dd-MM-yyyy HH:mm:ss", cal).toString()
     }
 
     private fun setUpUi() {
@@ -147,15 +154,13 @@ class StoryDisplayFragment : Fragment(), StoriesProgressView.StoriesListener {
         next.setOnTouchListener(touchListener)
 
         storiesProgressView?.setStoriesCountDebug(
-            stories.size,
-            arguments?.getInt(EXTRA_POSITION) ?: -1
+            stories.size, position = arguments?.getInt(EXTRA_POSITION) ?: -1
         )
         storiesProgressView?.setAllStoryDuration(4000L)
         storiesProgressView?.setStoriesListener(this)
 
         Glide.with(this).load(storyUser.profilePicUrl).circleCrop().into(storyDisplayProfilePicture)
         storyDisplayNick.text = storyUser.username
-
     }
 
     private fun showStoryOverlay() {
