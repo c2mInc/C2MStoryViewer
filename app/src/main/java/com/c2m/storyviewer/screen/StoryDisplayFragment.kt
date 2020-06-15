@@ -233,7 +233,7 @@ class StoryDisplayFragment : Fragment(),
         simpleExoPlayer?.addListener(object : Player.EventListener {
             override fun onPlayerError(error: ExoPlaybackException?) {
                 super.onPlayerError(error)
-                storyDisplayVideoProgress.visibility = View.GONE
+                storyDisplayVideoProgress.hide()
                 if (counter == stories.size.minus(1)) {
                     pageViewOperator?.nextPageView()
                 } else {
@@ -245,7 +245,7 @@ class StoryDisplayFragment : Fragment(),
                 super.onLoadingChanged(isLoading)
 
                 if (isLoading) {
-                    storyDisplayVideoProgress.visibility = View.VISIBLE
+                    storyDisplayVideoProgress.show()
                     pressTime = System.currentTimeMillis()
                     pauseCurrentStory()
                     hideStoryOverlay()
@@ -258,7 +258,7 @@ class StoryDisplayFragment : Fragment(),
                     )
                     showStoryOverlay()
                     resumeCurrentStory()
-                    storyDisplayVideoProgress.visibility = View.GONE
+                    storyDisplayVideoProgress.hide()
                 }
             }
 
