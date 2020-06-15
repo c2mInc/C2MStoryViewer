@@ -1,6 +1,8 @@
 package com.c2m.storyviewer.screen
 
 import android.content.Context
+import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.LayoutInflater
@@ -10,24 +12,40 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import com.c2m.storyviewer.*
+import com.c2m.storyviewer.R
 import com.c2m.storyviewer.customview.StoriesProgressView
 import com.c2m.storyviewer.data.Story
 import com.c2m.storyviewer.data.StoryUser
 import com.c2m.storyviewer.utils.OnSwipeTouchListener
+import com.c2m.storyviewer.utils.hide
+import com.c2m.storyviewer.utils.show
+import com.danikula.videocache.HttpProxyCacheServer
+import com.google.android.exoplayer2.ExoPlaybackException
+import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.upstream.DataSource
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.fragment_story_display.*
 import java.util.*
 
 class StoryDisplayFragment : Fragment(),
     StoriesProgressView.StoriesListener {
 
+    var simpleExoPlayer: SimpleExoPlayer? = null
+    private lateinit var mediaDataSourceFactory: DataSource.Factory
+
     private val position: Int by
     lazy { arguments?.getInt(EXTRA_POSITION) ?: 0 }
 
     private val storyUser: StoryUser by
-    lazy { (arguments?.getParcelable<StoryUser>(
-        EXTRA_STORY_USER
-    ) as StoryUser) }
+    lazy {
+        (arguments?.getParcelable<StoryUser>(
+            EXTRA_STORY_USER
+        ) as StoryUser)
+    }
 
     private val stories: ArrayList<Story> by
     lazy { storyUser.stories }
@@ -47,6 +65,7 @@ class StoryDisplayFragment : Fragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        storyDisplayVideo.useController = false
         updateStory()
         setUpUi()
     }
@@ -64,8 +83,10 @@ class StoryDisplayFragment : Fragment(),
     override fun onResume() {
         super.onResume()
         if (counter == 0) {
+            simpleExoPlayer?.playWhenReady = true
             storiesProgressView?.startStories()
         } else {
+            simpleExoPlayer?.playWhenReady = true
             // restart animation
             counter = MainActivity.progressState.get(arguments?.getInt(EXTRA_POSITION) ?: 0)
             storiesProgressView?.startStories(counter)
@@ -74,10 +95,12 @@ class StoryDisplayFragment : Fragment(),
 
     override fun onPause() {
         super.onPause()
+        simpleExoPlayer?.playWhenReady = false
         storiesProgressView?.abandon()
     }
 
     override fun onComplete() {
+        simpleExoPlayer?.release()
         pageViewOperator?.nextPageView()
     }
 
@@ -98,11 +121,24 @@ class StoryDisplayFragment : Fragment(),
     }
 
     private fun updateStory() {
-        Glide.with(this).load(stories[counter].url).into(storyDisplayImage)
+        simpleExoPlayer?.stop()
+        if (stories[counter].url.contains("mp4") || stories[counter].url.contains("video", true)
+        ) {
+            storyDisplayVideo.show()
+            storyDisplayImage.hide()
+            storyDisplayVideoProgress.show()
+            initializePlayer()
+        } else {
+            storyDisplayVideo.hide()
+            storyDisplayVideoProgress.hide()
+            storyDisplayImage.show()
+            Glide.with(this).load(stories[counter].url).into(storyDisplayImage)
+        }
 
         val cal: Calendar = Calendar.getInstance(Locale.ENGLISH).apply {
             timeInMillis = stories[counter].storyDate
         }
+
         storyDisplayTime.text = DateFormat.format("MM-dd-yyyy HH:mm:ss", cal).toString()
     }
 
@@ -169,6 +205,81 @@ class StoryDisplayFragment : Fragment(),
         storyDisplayNick.text = storyUser.username
     }
 
+    private fun initializePlayer() {
+        if (simpleExoPlayer == null)
+            simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(requireContext())
+        else {
+            simpleExoPlayer?.release()
+            simpleExoPlayer = null
+            simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(requireContext())
+        }
+
+        val proxyServer =
+            HttpProxyCacheServer.Builder(context).maxCacheSize(1024 * 1024 * 1024).build()
+        val proxyUURL = proxyServer.getProxyUrl(stories[counter].url)
+        mediaDataSourceFactory = DefaultDataSourceFactory(
+            requireContext(),
+            Util.getUserAgent(requireContext(), getString(R.string.app_name))
+        )
+        val mediaSource = ProgressiveMediaSource.Factory(mediaDataSourceFactory).createMediaSource(
+            Uri.parse(proxyUURL)
+        )
+        simpleExoPlayer?.prepare(mediaSource, false, false)
+        simpleExoPlayer?.playWhenReady = true
+
+        storyDisplayVideo.setShutterBackgroundColor(Color.BLACK)
+        storyDisplayVideo.player = simpleExoPlayer
+
+        simpleExoPlayer?.addListener(object : Player.EventListener {
+            override fun onPlayerError(error: ExoPlaybackException?) {
+                super.onPlayerError(error)
+                storyDisplayVideoProgress.visibility = View.GONE
+                if (counter == stories.size.minus(1)) {
+                    pageViewOperator?.nextPageView()
+                } else {
+                    storiesProgressView?.skip()
+                }
+            }
+
+            override fun onLoadingChanged(isLoading: Boolean) {
+                super.onLoadingChanged(isLoading)
+
+                if (isLoading) {
+                    storyDisplayVideoProgress.visibility = View.VISIBLE
+                    pressTime = System.currentTimeMillis()
+                    pauseCurrentStory()
+                    hideStoryOverlay()
+                } else {
+                    storiesProgressView?.getProgressWithIndex(counter)?.setDuration(
+                        8000L.coerceAtMost( // 8000L Max video duration
+                            simpleExoPlayer?.duration
+                                ?: 8000L
+                        )
+                    )
+                    showStoryOverlay()
+                    resumeCurrentStory()
+                    storyDisplayVideoProgress.visibility = View.GONE
+                }
+            }
+
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                super.onPlayerStateChanged(playWhenReady, playbackState)
+                when (playbackState) {
+                    Player.STATE_READY -> {
+                        showStoryOverlay()
+                    }
+                    Player.STATE_ENDED -> {
+                        if (counter == 0) {
+                            pageViewOperator?.backPageView()
+                        } else {
+                            storiesProgressView?.reverse()
+                        }
+                    }
+                }
+            }
+        })
+    }
+
     private fun showStoryOverlay() {
         if (storyOverlay == null || storyOverlay.alpha != 0F) return
 
@@ -196,12 +307,19 @@ class StoryDisplayFragment : Fragment(),
     }
 
     fun pauseCurrentStory() {
+        simpleExoPlayer?.playWhenReady = false
         storiesProgressView?.pause()
     }
 
     fun resumeCurrentStory() {
+        simpleExoPlayer?.playWhenReady = true
         showStoryOverlay()
         storiesProgressView?.resume()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        simpleExoPlayer?.release()
     }
 
     companion object {
