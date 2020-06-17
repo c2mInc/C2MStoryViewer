@@ -16,7 +16,7 @@ No need for an extra library. All used components are from the android widget se
 # Thanks:
 Awesome design: <a href="https://dribbble.com/metinckeles">@metinckeles</a> </br>
 Inspired repository: <a href="https://github.com/shts/StoriesProgressView">StoriesProgressView</a> </br> 
-Story images from: <a href="https://www.pexels.com/">Pexels</a> </br> 
+Story videos and images from: <a href="https://www.pexels.com/">Pexels</a> </br>
 Profile pics from: <a href="https://randomuser.me/">Randomuser</a> </br> 
 
 

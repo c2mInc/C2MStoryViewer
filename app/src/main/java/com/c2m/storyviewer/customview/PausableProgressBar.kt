@@ -32,6 +32,10 @@ class PausableProgressBar @JvmOverloads constructor(
 
     fun setDuration(duration: Long) {
         this.duration = duration
+        if (animation != null){
+            animation = null
+            startProgress()
+        }
     }
 
     fun setCallback(callback: Callback) {
@@ -78,7 +82,7 @@ class PausableProgressBar @JvmOverloads constructor(
 
     fun startProgress() {
         maxProgressView!!.visibility = View.GONE
-        if (duration <= 0) duration = 4000
+        if (duration <= 0) duration = DEFAULT_PROGRESS_DURATION
         animation =
             PausableScaleAnimation(
                 0f,
@@ -141,6 +145,6 @@ class PausableProgressBar @JvmOverloads constructor(
     }
 
     companion object {
-        private const val DEFAULT_PROGRESS_DURATION = 4000
+        private const val DEFAULT_PROGRESS_DURATION = 4000L
     }
 }
