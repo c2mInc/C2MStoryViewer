@@ -34,9 +34,6 @@ import java.util.*
 class StoryDisplayFragment : Fragment(),
     StoriesProgressView.StoriesListener {
 
-    var simpleExoPlayer: SimpleExoPlayer? = null
-    private lateinit var mediaDataSourceFactory: DataSource.Factory
-
     private val position: Int by
     lazy { arguments?.getInt(EXTRA_POSITION) ?: 0 }
 
@@ -48,6 +45,8 @@ class StoryDisplayFragment : Fragment(),
     private val stories: ArrayList<Story> by
     lazy { storyUser.stories }
 
+    private var simpleExoPlayer: SimpleExoPlayer? = null
+    private lateinit var mediaDataSourceFactory: DataSource.Factory
     private var pageViewOperator: PageViewOperator? = null
     private var counter = 0
     private var pressTime = 0L
@@ -133,8 +132,7 @@ class StoryDisplayFragment : Fragment(),
 
     private fun updateStory() {
         simpleExoPlayer?.stop()
-        if (stories[counter].isVideo() || stories[counter].url.contains("video", true)
-        ) {
+        if (stories[counter].isVideo()) {
             storyDisplayVideo.show()
             storyDisplayImage.hide()
             storyDisplayVideoProgress.show()
@@ -192,7 +190,6 @@ class StoryDisplayFragment : Fragment(),
 
             override fun onLoadingChanged(isLoading: Boolean) {
                 super.onLoadingChanged(isLoading)
-
                 if (isLoading) {
                     storyDisplayVideoProgress.show()
                     pressTime = System.currentTimeMillis()
@@ -203,19 +200,6 @@ class StoryDisplayFragment : Fragment(),
                         ?.setDuration(simpleExoPlayer?.duration ?: 8000L)
                     onVideoPrepared = true
                     resumeCurrentStory()
-                }
-            }
-
-            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                super.onPlayerStateChanged(playWhenReady, playbackState)
-                when (playbackState) {
-                    Player.STATE_ENDED -> {
-                        if (counter == 0) {
-                            pageViewOperator?.backPageView()
-                        } else {
-                            storiesProgressView?.reverse()
-                        }
-                    }
                 }
             }
         })
