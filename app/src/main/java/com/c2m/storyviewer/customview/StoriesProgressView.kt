@@ -166,7 +166,10 @@ class StoriesProgressView @JvmOverloads constructor(
     }
 
     fun resume() {
-        if (current < 0) return
+        if (current < 0 && progressBars.size > 0) {
+            progressBars[0].startProgress()
+            return
+        }
         progressBars[current].resumeProgress()
     }
 
