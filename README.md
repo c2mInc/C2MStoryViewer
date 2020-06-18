@@ -14,6 +14,7 @@ No need for an extra library. All used components are from the android widget se
 
 
 # Thanks:
+Video support contributor: <a href="https://github.com/furkanaskin">@furkanaskin</a> </br>
 Awesome design: <a href="https://dribbble.com/metinckeles">@metinckeles</a> </br>
 Inspired repository: <a href="https://github.com/shts/StoriesProgressView">StoriesProgressView</a> </br> 
 Story videos and images from: <a href="https://www.pexels.com/">Pexels</a> </br>
