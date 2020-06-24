@@ -2,19 +2,28 @@ package com.c2m.storyviewer.screen
 
 import android.animation.Animator
 import android.animation.ValueAnimator
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.util.SparseIntArray
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.bumptech.glide.Glide
-import com.c2m.storyviewer.*
+import com.c2m.storyviewer.R
+import com.c2m.storyviewer.app.StoryApp
 import com.c2m.storyviewer.customview.StoryPagerAdapter
 import com.c2m.storyviewer.data.StoryUser
 import com.c2m.storyviewer.utils.CubeOutTransformer
 import com.c2m.storyviewer.utils.StoryGenerator
+import com.google.android.exoplayer2.upstream.DataSource
+import com.google.android.exoplayer2.upstream.DataSpec
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.cache.CacheUtil
+import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 
 class MainActivity : AppCompatActivity(),
     PageViewOperator {
@@ -61,7 +70,8 @@ class MainActivity : AppCompatActivity(),
         )
         viewPager.adapter = pagerAdapter
         viewPager.currentItem = currentPage
-        viewPager.setPageTransformer(true,
+        viewPager.setPageTransformer(
+            true,
             CubeOutTransformer()
         )
         viewPager.addOnPageChangeListener(object : PageChangeListener() {
@@ -77,10 +87,59 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun preLoadStories(storyUserList: ArrayList<StoryUser>) {
-        storyUserList.forEach {storyUser ->
-            storyUser.stories.forEach {story ->
-                Glide.with(this).load(story.url).preload()
+        val imageList = mutableListOf<String>()
+        val videoList = mutableListOf<String>()
+
+        storyUserList.forEach { storyUser ->
+            storyUser.stories.forEach { story ->
+                if (story.isVideo()) {
+                    videoList.add(story.url)
+                } else {
+                    imageList.add(story.url)
+                }
             }
+        }
+        preLoadVideos(videoList)
+        preLoadImages(imageList)
+    }
+
+    private fun preLoadVideos(videoList: MutableList<String>) {
+        videoList.map { data ->
+            GlobalScope.async {
+                val dataUri = Uri.parse(data)
+                val dataSpec = DataSpec(dataUri, 0, 500 * 1024, null)
+                val dataSource: DataSource =
+                    DefaultDataSourceFactory(
+                        applicationContext,
+                        Util.getUserAgent(applicationContext, getString(R.string.app_name))
+                    ).createDataSource()
+
+                val listener =
+                    CacheUtil.ProgressListener { requestLength: Long, bytesCached: Long, _: Long ->
+                        val downloadPercentage = (bytesCached * 100.0
+                                / requestLength)
+                        Log.d("preLoadVideos", "downloadPercentage: $downloadPercentage")
+                    }
+
+                try {
+                    CacheUtil.cache(
+                        dataSpec,
+                        StoryApp.simpleCache,
+                        CacheUtil.DEFAULT_CACHE_KEY_FACTORY,
+                        dataSource,
+                        listener,
+                        null
+                    )
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    private fun preLoadImages(imageList: MutableList<String>) {
+        imageList.forEach { imageStory ->
+            Glide.with(this).load(imageStory).preload()
         }
     }
 

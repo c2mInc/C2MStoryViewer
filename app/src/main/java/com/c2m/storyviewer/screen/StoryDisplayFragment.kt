@@ -12,21 +12,22 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import com.c2m.storyviewer.*
+import com.c2m.storyviewer.R
+import com.c2m.storyviewer.app.StoryApp
 import com.c2m.storyviewer.customview.StoriesProgressView
 import com.c2m.storyviewer.data.Story
 import com.c2m.storyviewer.data.StoryUser
 import com.c2m.storyviewer.utils.OnSwipeTouchListener
 import com.c2m.storyviewer.utils.hide
 import com.c2m.storyviewer.utils.show
-import com.danikula.videocache.HttpProxyCacheServer
 import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.fragment_story_display.*
 import java.util.*
@@ -38,9 +39,11 @@ class StoryDisplayFragment : Fragment(),
     lazy { arguments?.getInt(EXTRA_POSITION) ?: 0 }
 
     private val storyUser: StoryUser by
-    lazy { (arguments?.getParcelable<StoryUser>(
-        EXTRA_STORY_USER
-    ) as StoryUser) }
+    lazy {
+        (arguments?.getParcelable<StoryUser>(
+            EXTRA_STORY_USER
+        ) as StoryUser)
+    }
 
     private val stories: ArrayList<Story> by
     lazy { storyUser.stories }
@@ -82,7 +85,7 @@ class StoryDisplayFragment : Fragment(),
     override fun onResume() {
         super.onResume()
         onResumeCalled = true
-        if (stories[counter].isVideo() && !onVideoPrepared){
+        if (stories[counter].isVideo() && !onVideoPrepared) {
             simpleExoPlayer?.playWhenReady = false
             return
         }
@@ -159,18 +162,20 @@ class StoryDisplayFragment : Fragment(),
             simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(requireContext())
         }
 
-        val proxyServer =
-            HttpProxyCacheServer.Builder(context).maxCacheSize(1024 * 1024 * 1024).build()
-        val proxyUURL = proxyServer.getProxyUrl(stories[counter].url)
-        mediaDataSourceFactory = DefaultDataSourceFactory(
-            requireContext(),
-            Util.getUserAgent(requireContext(), getString(R.string.app_name))
+        mediaDataSourceFactory = CacheDataSourceFactory(
+            StoryApp.simpleCache,
+            DefaultHttpDataSourceFactory(
+                Util.getUserAgent(
+                    context,
+                    Util.getUserAgent(requireContext(), getString(R.string.app_name))
+                )
+            )
         )
         val mediaSource = ProgressiveMediaSource.Factory(mediaDataSourceFactory).createMediaSource(
-            Uri.parse(proxyUURL)
+            Uri.parse(stories[counter].url)
         )
         simpleExoPlayer?.prepare(mediaSource, false, false)
-        if (onResumeCalled){
+        if (onResumeCalled) {
             simpleExoPlayer?.playWhenReady = true
         }
 
@@ -300,7 +305,7 @@ class StoryDisplayFragment : Fragment(),
     }
 
     fun resumeCurrentStory() {
-        if (onResumeCalled){
+        if (onResumeCalled) {
             simpleExoPlayer?.playWhenReady = true
             showStoryOverlay()
             storiesProgressView?.resume()
