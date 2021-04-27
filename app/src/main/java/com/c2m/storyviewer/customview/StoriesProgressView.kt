@@ -148,7 +148,18 @@ class StoriesProgressView @JvmOverloads constructor(
         }
     }
 
+    fun clear() {
+        progressBars.clear()
+        storiesCount = -1
+        current = -1
+        storiesListener = null
+        isComplete = false
+        isSkipStart = false
+        isReverseStart = false
+    }
+
     fun destroy() {
+        clear()
         for (p in progressBars) {
             p.clear()
         }

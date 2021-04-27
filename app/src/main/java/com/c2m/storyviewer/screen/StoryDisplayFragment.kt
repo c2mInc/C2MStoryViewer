@@ -130,6 +130,8 @@ class StoryDisplayFragment : Fragment(),
 
     override fun onDestroyView() {
         super.onDestroyView()
+        savePosition(0)
+        storiesProgressView?.destroy()
         simpleExoPlayer?.release()
     }
 
